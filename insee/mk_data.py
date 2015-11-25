@@ -1,111 +1,153 @@
 # -*- coding: utf-8 -*-
+"""
+Created on Thu Jun  4 12:45:22 2015
+
+@author: Florian, Alexis
+"""
 
 import pandas as pd
 
-print "Initialisation..."
+##################### IMPORT DES DONNEES COMMUNES ############################
 
-## Commerce
-commerce = pd.read_excel('data/equip-serv-commerce-infra.xls', sheetname='IRIS')
-# creating header from file
-header = commerce.loc[4].tolist()
-commerce.columns = header
-# to get real values
-commerce = commerce[5:]
-# clean Nan Columns
-commerce.dropna(how='any', axis=(1), inplace=True)
-header = [x for x in header if str(x) !='nan'] # remove NaN to header to create new sum feature
-# creating new feature : sum of all feature
-features = [x for x in header if x not in ['CODGEO','LIBGEO','COM','LIBCOM','REG','DEP','ARR','CV','ZE2010','UU2010']]
-commerce['nb_commerce'] =  commerce[features].applymap(lambda x: float(x)).sum(axis=1)
+#
+#def read_from_csv()
+#
+#
+#    # -- Keep &  Drop columns
+#    agg_cols = ['CODGEO', 'LIBGEO', 'COM', 'LIBCOM', 'REG', 'DEP', 'ARR',
+#                'CV', 'ZE2010', 'UU2010', 'UU12010', 'ID_MODIF_GEO']
+#
+#    path = r'D:\Data\base_commune\CSV'
+##    files = glob.glob(path + "/*.csv")
+##    dict_dtypes = {'CODGEO': str,
+##                   'DEP': str}
+##    df1 = pd.read_csv(files[0], dtype=dict_dtypes)
+#
+#
+#    df1 = df1[df1.DEP == '60']
+#    # Initialisation du df + key pour le merge
+#    t_communes = pd.DataFrame()
+#    t_communes['CODGEO'] = df1.CODGEO
+#
+#    for f in files:
+#        df = pd.read_csv(f, dtype=dict_dtypes)
+#        # -- Oise
+#        df = df[df.DEP == '60']
+#        # -- Drop useless cols
+#        drop = [x for x in df.columns if x in drop_cols]
+#        df.drop(drop, inplace=True, axis=1)
+#        # -- Calcul des indicateurs nb_...
+#        features = [x for x in df.columns if x not in agg_cols]
+#        try:  # Si l'item est dans le dict
+#            var = file_dict[f]
+#            if var in ['nb_enseignement_1', 'nb_enseignement_2']:
+#                df[var] = sum_features(df, file_spe[var])
+#            else:
+#                df[var] = sum_features(df, features)
+#        except KeyError:
+#            print(str(f.split('\\')[4]) + '   => No sum for this table')
+#            pass
+#        t_communes = pd.merge(t_communes, df, on='CODGEO', how='outer')
+#
+#    t_communes = t_communes.rename(columns={'CODGEO': 'COM'})
+#
+#    return t_communes
 
-data = commerce
-print "il y a  %d iris différentes pour le commerce et %d features" % (len(commerce.CODGEO.unique()), len(features))
-
-
-## Sport
-sport = pd.read_excel('data/equip-sport-loisir-socio-infra-13.xls', sheetname='IRIS')
-# creating header from file
-header = sport.loc[4].tolist()
-sport.columns = header
-# to get real values
-sport = sport[5:]
-# creating new feature : sum all features non aggregated
-features = [x for x in header if x not in ['CODGEO','LIBGEO','COM','LIBCOM','REG','DEP','ARR','CV','ZE2010','UU2010']]
-sport['nb_sport'] =  sport[['NB_F101', 'NB_F102', 'NB_F103', 'NB_F104', 'NB_F105',
-                            'NB_F106', 'NB_F107', 'NB_F108', 'NB_F109', 'NB_F110', 
-                            'NB_F111', 'NB_F112', 'NB_F113', 'NB_F114', 'NB_F115',
-                            'NB_F117', 'NB_F118']].applymap(lambda x: float(x)).sum(axis=1)
-sport['nb_airjeu_sport'] =  sport[['NB_F101_NB_AIREJEU', 'NB_F102_NB_AIREJEU', 'NB_F103_NB_AIREJEU',
-                                    'NB_F104_NB_AIREJEU', 'NB_F105_NB_AIREJEU', 'NB_F106_NB_AIREJEU', 
-                                    'NB_F107_NB_AIREJEU', 'NB_F108_NB_AIREJEU', 'NB_F108_NB_AIREJEU', 
-                                    'NB_F110_NB_AIREJEU', 'NB_F111_NB_AIREJEU', 'NB_F112_NB_AIREJEU', 
-                                    'NB_F113_NB_AIREJEU', 'NB_F114_NB_AIREJEU', 'NB_F115_NB_AIREJEU', 
-                                    'NB_F116_NB_AIREJEU', 'NB_F117_NB_AIREJEU', 'NB_F118_NB_AIREJEU']].applymap(lambda x: float(x)).sum(axis=1)
-[features.append(i) for i in ['nb_sport', 'CODGEO']]
-print "il y a  %d iris différentes pour le sport et %d features" % (len(sport.CODGEO.unique()), len(features) - 1)
-
-data = pd.merge(data, sport[features], on='CODGEO', how='outer')
-
-
-## Enseignement 1er degré 
-enseignement_1 = pd.read_excel('data/equip-serv-ens-1er-degre-infra.xls', sheetname='IRIS')
-# creating header from file
-header = enseignement_1.loc[4].tolist()
-enseignement_1.columns = header
-# to get real values
-enseignement_1 = enseignement_1[5:]
-# creating new feature : sum all features non aggregated
-features = [x for x in header if x not in ['CODGEO','LIBGEO','COM','LIBCOM','REG','DEP','ARR','CV','ZE2010','UU2010']]
-enseignement_1['nb_enseignement_1'] =  enseignement_1[['NB_C101', 'NB_C102', 'NB_C104',
-                                                        'NB_C105']].applymap(lambda x: float(x)).sum(axis=1)
-[features.append(i) for i in ['nb_enseignement_1', 'CODGEO']]
-print "il y a  %d iris différentes pour l'enseignement du 1er degré et %d features" % (len(enseignement_1.CODGEO.unique()), len(features) - 1)
-
-data = pd.merge(data, enseignement_1[features], on='CODGEO', how='outer')
+##################### IMPORT DES DONNEES IRIS ############################
 
 
-## Enseignement du second degré 
-enseignement_2 = pd.read_excel('data/equip-serv-ens-2eme-degre-infra.xls', sheetname='IRIS')
-# creating header from file
-header = enseignement_2.loc[4].tolist()
-enseignement_2.columns = header
-# to get real values
-enseignement_2 = enseignement_2[5:]
-# creating new feature : sum all features non aggregated
-features = [x for x in header if x not in ['CODGEO','LIBGEO','COM','LIBCOM','REG','DEP','ARR','CV','ZE2010','UU2010']]
-enseignement_2['nb_enseignement_2'] =  enseignement_2[['NB_C201', 'NB_C301', 'NB_C302',
-                                                        'NB_C303', 'NB_C304', 'NB_C305']].applymap(lambda x: float(x)).sum(axis=1)
-[features.append(i) for i in ['nb_enseignement_2', 'CODGEO']]
-print "il y a  %d iris différentes pour l'enseignement du second degré et %d features" % (len(enseignement_2.CODGEO.unique()), len(features) - 1)
+''' Import des données IRIS grâce à l'open-moulinette'''
+print("Initialisation...")
 
-data = pd.merge(data, enseignement_2[features], on='CODGEO', how='outer')
+path = 'data/'
+
+key = ['CODGEO', 'LIBGEO', 'COM', 'LIBCOM', 'REG', 'DEP', 'UU2010']
+
+columns_not_to_sum = ['CODGEO', 'LIBGEO', 'COM', 'LIBCOM', 'REG', 'DEP', 'ARR',
+                      'CV', 'ZE2010', 'UU2010', 'UU12010', 'ID_MODIF_GEO']
 
 
-## Enseignement supérieur 
-enseignement_sup = pd.read_excel('data/equip-serv-ens-sup-form-serv-infra.xls', sheetname='IRIS')
-# creating header from file
-header = enseignement_sup.loc[4].tolist()
-enseignement_sup.columns = header
-# to get real values
-enseignement_sup = enseignement_sup[5:]
-# creating new feature : sum all features non aggregated
-features = [x for x in header if x not in ['CODGEO','LIBGEO','COM','LIBCOM','REG','DEP','ARR','CV','ZE2010','UU2010']]
-enseignement_sup['nb_enseignement_sup'] =  enseignement_sup[['NB_C401', 'NB_C402', 'NB_C403',
-                                                            'NB_C409', 'NB_C501', 'NB_C502', 
-                                                            'NB_C503', 'NB_C504', 'NB_C509', 
-                                                            'NB_C601', 'NB_C602', 'NB_C603', 
-                                                            'NB_C604', 'NB_C605', 'NB_C609']].applymap(lambda x: float(x)).sum(axis=1)
-[features.append(i) for i in ['nb_enseignement_sup', 'CODGEO']]
-print "il y a  %d iris différentes pour l'enseignement du supérieur et %d features" % (len(enseignement_sup.CODGEO.unique()), len(features) - 1)
+def _read_iris_file(filename):
+    return pd.read_excel(path + filename + '.xls', sheetname='IRIS')
 
-data = pd.merge(data, enseignement_sup[features], on='CODGEO', how='outer')
+
+def _change_headers(iris_df):
+    ''' iris_df is an iris data frame'''
+#    iris_df.rename(columns={'IRIS':'CODGEO'}, inplace=True)
+    header = iris_df.loc[4].tolist()
+    iris_df.columns = header
+    # to get real values
+    iris_df = iris_df[5:]
+    # clean Nan Columns
+    iris_df.dropna(how='any', axis=(1), inplace=True)
+    return iris_df
+
+
+def _sum_of_all_features(iris_df, colname, list_to_sum=None):
+    ''' iris_df is an iris data frame
+        colname is the name of the sum of columns'''
+    header = [x for x in iris_df.columns if str(x) != 'nan'] # remove NaN to header to create new sum feature
+    # creating new feature : sum of all feature
+    if list_to_sum is None:
+        features = [x for x in header if x not in columns_not_to_sum]
+    else:
+        features = list_to_sum
+    iris_df[colname] = iris_df[features].applymap(lambda x: float(x)).sum(axis=1)
+    nb_features = len(features)
+    print("\t il y a ", len(iris_df.CODGEO.unique()),
+          " iris différentes pour et ", nb_features, " features")
+    return iris_df
+
+
+def routine1(name):
+    assert name in iris_table
+    filename, list_to_sum = iris_table[name]
+    df = _read_iris_file(filename)
+    df = _change_headers(df)
+    df = _sum_of_all_features(df, 'nb_' + name, list_to_sum)
+
+    return df
+
+iris_table = dict(
+    commerce = ('equip-serv-commerce-infra', None),
+    sport = ('equip-sport-loisir-socio-infra-13',
+             ['NB_F101', 'NB_F102', 'NB_F103', 'NB_F104',
+              'NB_F105', 'NB_F106', 'NB_F107', 'NB_F108',
+              'NB_F109', 'NB_F110', 'NB_F111', 'NB_F112',
+              'NB_F113', 'NB_F114', 'NB_F115', 'NB_F117', 'NB_F118']),
+    enseignement_degre_1 = ('equip-serv-ens-1er-degre-infra',
+                            ['NB_C101', 'NB_C102', 'NB_C104', 'NB_C105']),
+    enseignement_degre_2 = ('equip-serv-ens-2eme-degre-infra',
+                            ['NB_C201', 'NB_C301', 'NB_C302', 'NB_C303',
+                             'NB_C304', 'NB_C305']),
+    enseignement_sup = ('equip-serv-ens-sup-form-serv-infra',
+                        ['NB_C401', 'NB_C402', 'NB_C403',
+                         'NB_C409', 'NB_C501', 'NB_C502',
+                         'NB_C503', 'NB_C504', 'NB_C509',
+                         'NB_C601', 'NB_C602', 'NB_C603',
+                         'NB_C604', 'NB_C605', 'NB_C609',
+                         'NB_C701', 'NB_C702']),
+    social = ('equip-serv-action-sociale-infra', None),
+    sante = ('equip-serv-sante-infra', None),
+    medical = ('equip-serv-medical-para-infra', None),
+    service_particulier = ('equip-serv-particuliers-infra', None),
+    transport_tourisme = ('equip-tour-transp-infra', None),
+    )
+
+data = None
+for table in iris_table:
+    print('* lecture de ' + table)
+    if data is None:
+        data = routine1(table)
+    else:
+        data = data.merge(routine1(table), how='outer')
 
 
 ### Revenu have 4 files [ménage, personne, unité de consomation, ensemble]
 #-------------------------------------------------------------------------
 
 ## Revenu Ménage
-revenu_menage = pd.read_excel('data/RFDM2011IRI.xls', sheetname=1) #using int cause name of sheetname have some "é"
+revenu_menage = pd.read_excel(path + 'RFDM2011IRI.xls', sheetname=1) #using int cause name of sheetname have some "é"
 # creating header from file
 header = revenu_menage.loc[5].tolist()
 revenu_menage.columns = header
@@ -116,12 +158,12 @@ revenu_menage = revenu_menage[6:]
 features = [x for x in header if x not in ['IRIS','LIBIRIS','COM','LIBCOM','REG','DEP','ARR','CV','ZE2010']] # special list for this file
 # No need to sum features here (% and quantile)
 features.append('CODGEO')
-print "il y a  %d iris différentes pour le revenu par ménage et %d features" % (len(revenu_menage.CODGEO.unique()), len(features) - 1)
+print("il y a  %d iris différentes pour le revenu par ménage et %d features" % (len(revenu_menage.CODGEO.unique()), len(features) - 1))
 
 data = pd.merge(data, revenu_menage[features], on='CODGEO', how='outer')
 
 ## Revenu par personne
-revenu_personne = pd.read_excel('data/RFDP2011IRI.xls', sheetname=1) #using int cause name of sheetname have some "é"
+revenu_personne = pd.read_excel(path+'RFDP2011IRI.xls', sheetname=1) #using int cause name of sheetname have some "é"
 # creating header from file
 header = revenu_personne.loc[5].tolist()
 revenu_personne.columns = header
@@ -132,13 +174,13 @@ revenu_personne = revenu_personne[6:]
 features = [x for x in header if x not in ['IRIS','LIBIRIS','COM','LIBCOM','REG','DEP','ARR','CV','ZE2010']] # special list for this file
 # No need to sum features here (% and quantile)
 features.append('CODGEO')
-print "il y a  %d iris différentes pour le revenu par personne et %d features" % (len(revenu_personne.CODGEO.unique()), len(features) - 1)
+print("il y a  %d iris différentes pour le revenu par personne et %d features" % (len(revenu_personne.CODGEO.unique()), len(features) - 1))
 
 data = pd.merge(data, revenu_personne[features], on='CODGEO', how='outer')
 
 
 ## Revenu par unité de consomation
-revenu_uc = pd.read_excel('data/RFDU2011IRI.xls', sheetname=1) #using int cause name of sheetname have some "é"
+revenu_uc = pd.read_excel(path+'RFDU2011IRI.xls', sheetname=1) #using int cause name of sheetname have some "é"
 # creating header from file
 header = revenu_uc.loc[5].tolist()
 revenu_uc.columns = header
@@ -149,12 +191,12 @@ revenu_uc = revenu_uc[6:]
 features = [x for x in header if x not in ['IRIS','LIBIRIS','COM','LIBCOM','REG','DEP','ARR','CV','ZE2010']] # special list for this file
 # No need to sum features here (% and quantile)
 features.append('CODGEO')
-print "il y a  %d iris différentes pour le revenu par unité de consomation et %d features" % (len(revenu_uc.CODGEO.unique()), len(features) - 1)
+print("il y a  %d iris différentes pour le revenu par unité de consomation et %d features" % (len(revenu_uc.CODGEO.unique()), len(features) - 1))
 
 data = pd.merge(data, revenu_uc[features], on='CODGEO', how='outer')
 
 ## Revenu % imposé + détails (% ménage imposé, dont traitement salaire etc..)
-revenu_impose = pd.read_excel('data/RFST2011IRI.xls', sheetname=1) #using int cause name of sheetname have some "é"
+revenu_impose = pd.read_excel(path+'RFST2011IRI.xls', sheetname=1) #using int cause name of sheetname have some "é"
 # creating header from file
 header = revenu_impose.loc[5].tolist()
 revenu_impose.columns = header
@@ -165,7 +207,7 @@ revenu_impose = revenu_impose[6:]
 features = [x for x in header if x not in ['IRIS','LIBIRIS','COM','LIBCOM','REG','DEP','ARR','CV','ZE2010']] # special list for this file
 # No need to sum features here (% and quantile)
 features.append('CODGEO')
-print "il y a  %d iris différentes pour le revenu par ménage imposé et %d features" % (len(revenu_impose.CODGEO.unique()), len(features) - 1)
+print("il y a  %d iris différentes pour le revenu par ménage imposé et %d features" % (len(revenu_impose.CODGEO.unique()), len(features) - 1))
 
 data = pd.merge(data, revenu_impose[features], on='CODGEO', how='outer')
 
@@ -173,90 +215,12 @@ data = pd.merge(data, revenu_impose[features], on='CODGEO', how='outer')
 #-------------------------------------------------------------------------
 
 
-## Equipement social 
-equipement_social = pd.read_excel('data/equip-serv-action-sociale-infra.xls', sheetname='IRIS')
-# creating header from file
-header = equipement_social.loc[4].tolist()
-equipement_social.columns = header
-# to get real values
-equipement_social = equipement_social[5:]
-# creating new feature : sum of all feature
-features = [x for x in header if x not in ['CODGEO','LIBGEO','COM','LIBCOM','REG','DEP','ARR','CV','ZE2010','UU2010']]
-equipement_social['nb_equipement_social'] =  equipement_social[features].applymap(lambda x: float(x)).sum(axis=1)
-[features.append(i) for i in ['nb_equipement_social', 'CODGEO']]
-print "il y a  %d iris différentes pour l'équipement social et %d features" % (len(equipement_social.CODGEO.unique()), len(features) - 1)
-
-data = pd.merge(data, equipement_social[features], on='CODGEO', how='outer')
-
-
-## Equipement santé
-equipement_sante = pd.read_excel('data/equip-serv-sante-infra.xls', sheetname='IRIS')
-# creating header from file
-header = equipement_sante.loc[4].tolist()
-equipement_sante.columns = header
-# to get real values
-equipement_sante = equipement_sante[5:]
-# creating new feature : sum of all feature
-features = [x for x in header if x not in ['CODGEO','LIBGEO','COM','LIBCOM','REG','DEP','ARR','CV','ZE2010','UU2010']]
-equipement_sante['nb_equipement_sante'] =  equipement_sante[features].applymap(lambda x: float(x)).sum(axis=1)
-[features.append(i) for i in ['nb_equipement_sante', 'CODGEO']]
-print "il y a  %d iris différentes pour l'équipement de santé et %d features" % (len(equipement_sante.CODGEO.unique()), len(features) - 1)
-
-data = pd.merge(data, equipement_sante[features], on='CODGEO', how='outer')
-
-
-## Fonction médical
-fonction_medical = pd.read_excel('data/equip-serv-medical-para-infra.xls', sheetname='IRIS')
-# creating header from file
-header = fonction_medical.loc[4].tolist()
-fonction_medical.columns = header
-# to get real values
-fonction_medical = fonction_medical[5:]
-# creating new feature : sum of all feature
-features = [x for x in header if x not in ['CODGEO','LIBGEO','COM','LIBCOM','REG','DEP','ARR','CV','ZE2010','UU2010']]
-fonction_medical['nb_fonction_medical'] =  fonction_medical[features].applymap(lambda x: float(x)).sum(axis=1)
-[features.append(i) for i in ['nb_fonction_medical', 'CODGEO']]
-print "il y a  %d iris différentes pour les fonctions médical et %d features" % (len(fonction_medical.CODGEO.unique()), len(features) - 1)
-
-data = pd.merge(data, fonction_medical[features], on='CODGEO', how='outer')
-
-## Service pour les particuliers
-service_particulier = pd.read_excel('data/equip-serv-particuliers-infra.xls', sheetname='IRIS')
-# creating header from file
-header = service_particulier.loc[4].tolist()
-service_particulier.columns = header
-# to get real values
-service_particulier = service_particulier[5:]
-# creating new feature : sum of all feature
-features = [x for x in header if x not in ['CODGEO','LIBGEO','COM','LIBCOM','REG','DEP','ARR','CV','ZE2010','UU2010']]
-service_particulier['nb_service_particulier'] =  service_particulier[features].applymap(lambda x: float(x)).sum(axis=1)
-[features.append(i) for i in ['nb_service_particulier', 'CODGEO']]
-print "il y a  %d iris différentes pour les services aux particulier et %d features" % (len(service_particulier.CODGEO.unique()), len(features) - 1)
-
-data = pd.merge(data, service_particulier[features], on='CODGEO', how='outer')
-
-
-## Transport touristique
-transport_tourisme = pd.read_excel('data/equip-tour-transp-infra.xls', sheetname='IRIS')
-# creating header from file
-header = transport_tourisme.loc[4].tolist()
-transport_tourisme.columns = header
-# to get real values
-transport_tourisme = transport_tourisme[5:]
-# creating new feature : sum of all feature
-features = [x for x in header if x not in ['CODGEO','LIBGEO','COM','LIBCOM','REG','DEP','ARR','CV','ZE2010','UU2010']]
-transport_tourisme['nb_transport_tourisme'] =  transport_tourisme[features].applymap(lambda x: float(x)).sum(axis=1)
-[features.append(i) for i in ['nb_transport_tourisme', 'CODGEO']]
-print "il y a  %d iris différentes pour le transport touristique et %d features" % (len(transport_tourisme.CODGEO.unique()), len(features) - 1)
-
-data = pd.merge(data, transport_tourisme[features], on='CODGEO', how='outer')
-
 ############################################################
 ####                CENSUS FILES
 ############################################################
 
 ## Logement
-logement = pd.read_excel('data/base-ic-logement-2011.xls', sheetname='IRIS')
+logement = pd.read_excel(path+'base-ic-logement-2011.xls', sheetname='IRIS')
 # creating header from file
 header = logement.loc[4].tolist()
 logement.columns = header
@@ -268,14 +232,13 @@ logement = logement[5:]
 features = [x for x in header if x not in ['IRIS', 'LIBIRIS']]
 [features.append(i) for i in ['CODGEO', 'LIBGEO']]
 
-key = ['CODGEO', 'LIBGEO', 'COM', 'LIBCOM', 'REG', 'DEP', 'UU2010']       
-print "il y a  %d iris différentes pour le logement et %d features" % (len(logement.CODGEO.unique()), len(features) - 1)
+key = ['CODGEO', 'LIBGEO', 'COM', 'LIBCOM', 'REG', 'DEP', 'UU2010']
 
 data = pd.merge(data, logement[features], on=key, how='outer')
 
 
 ## Diplome
-diplome = pd.read_excel('data/base-ic-diplomes-formation-2011.xls', sheetname='IRIS')
+diplome = pd.read_excel(path+'base-ic-diplomes-formation-2011.xls', sheetname='IRIS')
 # creating header from file
 header = diplome.loc[4].tolist()
 diplome.columns = header
@@ -288,14 +251,13 @@ features = [x for x in header if x not in ['IRIS', 'LIBIRIS']]
 [features.append(i) for i in ['CODGEO', 'LIBGEO']]
 
 key = ['CODGEO', 'LIBGEO', 'COM', 'LIBCOM', 'REG', 'DEP', 'UU2010',
-       'TRIRIS', 'GRD_QUART', 'TYP_IRIS', 'MODIF_IRIS', 'LAB_IRIS'] # This line has been load with Logement file 
-print "il y a  %d iris différentes pour les diplomes et %d features" % (len(diplome.CODGEO.unique()), len(features) - 1)
+       'TRIRIS', 'GRD_QUART', 'TYP_IRIS', 'MODIF_IRIS', 'LAB_IRIS'] # This line has been load with Logement file
 
 data = pd.merge(data, diplome[features], on=key, how='outer')
 
 
 ## Famille
-famille = pd.read_excel('data/base-ic-couples-familles-menages-2011.xls', sheetname='IRIS')
+famille = pd.read_excel(path+'base-ic-couples-familles-menages-2011.xls', sheetname='IRIS')
 # creating header from file
 header = famille.loc[4].tolist()
 famille.columns = header
@@ -308,15 +270,14 @@ features = [x for x in header if x not in ['IRIS', 'LIBIRIS']]
 [features.append(i) for i in ['CODGEO', 'LIBGEO']]
 
 key = ['CODGEO', 'LIBGEO', 'COM', 'LIBCOM', 'REG', 'DEP', 'UU2010',
-       'TRIRIS', 'GRD_QUART', 'TYP_IRIS', 'MODIF_IRIS', 'LAB_IRIS'] # This line has been load with Logement file 
-               
-print "il y a  %d iris différentes pour les familles et %d features" % (len(famille.CODGEO.unique()), len(features) - 1)
+       'TRIRIS', 'GRD_QUART', 'TYP_IRIS', 'MODIF_IRIS', 'LAB_IRIS'] # This line has been load with Logement file
+
 
 data = pd.merge(data, famille[features], on=key, how='outer')
 
 
 ## Population
-population = pd.read_excel('data/base-ic-evol-struct-pop-2011.xls', sheetname='IRIS')
+population = pd.read_excel(path+'base-ic-evol-struct-pop-2011.xls', sheetname='IRIS')
 # creating header from file
 header = population.loc[4].tolist()
 population.columns = header
@@ -329,14 +290,13 @@ features = [x for x in header if x not in ['IRIS', 'LIBIRIS']]
 [features.append(i) for i in ['CODGEO', 'LIBGEO']]
 
 key = ['CODGEO', 'LIBGEO', 'COM', 'LIBCOM', 'REG', 'DEP', 'UU2010',
-       'TRIRIS', 'GRD_QUART', 'TYP_IRIS', 'MODIF_IRIS', 'LAB_IRIS'] # This line has been load with Logement file 
-                 
-print "il y a  %d iris différentes pour le population et %d features" % (len(population.CODGEO.unique()), len(features) - 1)
+       'TRIRIS', 'GRD_QUART', 'TYP_IRIS', 'MODIF_IRIS', 'LAB_IRIS'] # This line has been load with Logement file
+
 data = pd.merge(data, population[features], on=key, how='outer')
 
 
 ## Activité
-activite = pd.read_excel('data/base-ic-activite-residents-2011.xls', sheetname='IRIS')
+activite = pd.read_excel(path+'base-ic-activite-residents-2011.xls', sheetname='IRIS')
 # creating header from file
 header = activite.loc[4].tolist()
 activite.columns = header
@@ -349,16 +309,6 @@ features = [x for x in header if x not in ['IRIS', 'LIBIRIS']]
 [features.append(i) for i in ['CODGEO', 'LIBGEO']]
 
 key = ['CODGEO', 'LIBGEO', 'COM', 'LIBCOM', 'REG', 'DEP', 'UU2010',
-       'TRIRIS', 'GRD_QUART', 'TYP_IRIS', 'MODIF_IRIS', 'LAB_IRIS'] # This line has been load with Logement file 
-                 
-print "il y a  %d iris différentes pour l'activité et %d features" % (len(activite.CODGEO.unique()), len(features) - 1)
+       'TRIRIS', 'GRD_QUART', 'TYP_IRIS', 'MODIF_IRIS', 'LAB_IRIS'] # This line has been load with Logement file
+
 data = pd.merge(data, activite[features], on=key, how='outer')
-
-
-# Extract 
-print "Extracting file in /data/output.csv"
-data.to_csv('data/output.csv', sep=';', index=False, encoding='utf-8')
-
-
-
-
