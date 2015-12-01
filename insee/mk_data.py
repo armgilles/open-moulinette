@@ -90,11 +90,13 @@ def routine2(year):
 
 revenu = routine2(2011)
 
-
-
 data = equip_data.merge(revenu, how='outer')
-### Fin de revenu
-#-------------------------------------------------------------------------
+
+## petit bout de code pour voir ce qui s'ajoute
+#cond = equip_data.CODGEO.isin(revenu.CODGEO)
+#equip_data[cond]
+#cond = revenu.CODGEO.isin(equip_data.CODGEO)
+#revenu[~cond]
 
 
 ############################################################
