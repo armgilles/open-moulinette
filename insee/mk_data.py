@@ -103,6 +103,16 @@ data = equip_data.merge(revenu, how='outer')
 ####                CENSUS FILES
 ############################################################
 
+list_recensement = ['logement', 'diplomes-formation', 
+                    'couples-familles-menages', 'evol-struct-pop',
+                    'activite-residents']
+
+filename = 'base-ic-' + file + '-2011.xls'
+
+
+activite.rename(columns={'IRIS':'CODGEO', 'LIBIRIS': 'LIBGEO'}, inplace=True)
+
+
 ## Logement
 logement = pd.read_excel(path_data+'base-ic-logement-2011.xls', sheetname='IRIS')
 # creating header from file
@@ -112,85 +122,9 @@ logement.rename(columns={'IRIS':'CODGEO', 'LIBIRIS': 'LIBGEO'}, inplace=True)
 # to get real values
 logement = logement[5:]
 
-# Adding CODGEO (iris ID) and other geo features witch are not in data
-features = [x for x in header if x not in ['IRIS', 'LIBIRIS']]
-[features.append(i) for i in ['CODGEO', 'LIBGEO']]
-
-key = ['CODGEO', 'LIBGEO', 'COM', 'LIBCOM', 'REG', 'DEP', 'UU2010']
-
-data = pd.merge(data, logement[features], on=key, how='outer')
-
-
-## Diplome
-diplome = pd.read_excel(path_data+'base-ic-diplomes-formation-2011.xls', sheetname='IRIS')
-# creating header from file
-header = diplome.loc[4].tolist()
-diplome.columns = header
-diplome.rename(columns={'IRIS':'CODGEO', 'LIBIRIS': 'LIBGEO'}, inplace=True)
-# to get real values
-diplome = diplome[5:]
-
-# Adding CODGEO (iris ID) and other geo features witch are not in data
-features = [x for x in header if x not in ['IRIS', 'LIBIRIS']]
-[features.append(i) for i in ['CODGEO', 'LIBGEO']]
-
-key = ['CODGEO', 'LIBGEO', 'COM', 'LIBCOM', 'REG', 'DEP', 'UU2010',
-       'TRIRIS', 'GRD_QUART', 'TYP_IRIS', 'MODIF_IRIS', 'LAB_IRIS'] # This line has been load with Logement file
-
-data = pd.merge(data, diplome[features], on=key, how='outer')
-
-
-## Famille
-famille = pd.read_excel(path_data+'base-ic-couples-familles-menages-2011.xls', sheetname='IRIS')
-# creating header from file
-header = famille.loc[4].tolist()
-famille.columns = header
-famille.rename(columns={'IRIS':'CODGEO', 'LIBIRIS': 'LIBGEO'}, inplace=True)
-# to get real values
-famille = famille[5:]
-
-# Adding CODGEO (iris ID) and other geo features witch are not in data
-features = [x for x in header if x not in ['IRIS', 'LIBIRIS']]
-[features.append(i) for i in ['CODGEO', 'LIBGEO']]
-
-key = ['CODGEO', 'LIBGEO', 'COM', 'LIBCOM', 'REG', 'DEP', 'UU2010',
-       'TRIRIS', 'GRD_QUART', 'TYP_IRIS', 'MODIF_IRIS', 'LAB_IRIS'] # This line has been load with Logement file
-
-
-data = pd.merge(data, famille[features], on=key, how='outer')
-
-
 ## Population
 population = pd.read_excel(path_data+'base-ic-evol-struct-pop-2011.xls', sheetname='IRIS')
-# creating header from file
-header = population.loc[4].tolist()
-population.columns = header
-population.rename(columns={'IRIS':'CODGEO', 'LIBIRIS': 'LIBGEO'}, inplace=True)
-# to get real values
-population = population[5:]
 
-# Adding CODGEO (iris ID) and other geo features witch are not in data
-features = [x for x in header if x not in ['IRIS', 'LIBIRIS']]
-[features.append(i) for i in ['CODGEO', 'LIBGEO']]
-
-key = ['CODGEO', 'LIBGEO', 'COM', 'LIBCOM', 'REG', 'DEP', 'UU2010',
-       'TRIRIS', 'GRD_QUART', 'TYP_IRIS', 'MODIF_IRIS', 'LAB_IRIS'] # This line has been load with Logement file
-
-data = pd.merge(data, population[features], on=key, how='outer')
-
-
-## Activité
-activite = pd.read_excel(path_data+'base-ic-activite-residents-2011.xls', sheetname='IRIS')
-# creating header from file
-header = activite.loc[4].tolist()
-activite.columns = header
-activite.rename(columns={'IRIS':'CODGEO', 'LIBIRIS': 'LIBGEO'}, inplace=True)
-# to get real values
-activite = activite[5:]
-
-# Adding CODGEO (iris ID) and other geo features witch are not in data
-features = [x for x in header if x not in ['IRIS', 'LIBIRIS']]
-[features.append(i) for i in ['CODGEO', 'LIBGEO']]
 
 key = ['CODGEO', 'LIBGEO', 'COM', 'LIBCOM', 'REG', 'DEP', 'UU2010',
        'TRIRIS', 'GRD_QUART', 'TYP_IRIS', 'MODIF_IRIS', 'LAB_IRIS'] # This line has been load with Logement file
