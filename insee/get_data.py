@@ -68,6 +68,12 @@ def revenu_url(year):
     zip_name = filename + '-iris-' + str(year) + '.zip'
     return general_url + year_folder + zip_name
 
+def recensement_url(filename, year):
+    part1 = 'rp' + str(year) + '/infracommunal'
+    part2 = '/infra-' + filename + '-' + str(year)[-2:]
+    part3 = '/infra-' + filename + '-' + str(year) + '.zip'
+    return path_insee + part1 + part2 + part3
+
 
 def _read_file_or_download(list_filenames, path, url):
     if not isinstance(list_filenames, list):
@@ -85,7 +91,6 @@ def read_equipement_file(filename):
     path_file_on_disk = path_data + filename + '-infra.xls'
     _read_file_or_download(filename + '-infra.xls', path_data, url_path)
     return pd.read_excel(path_file_on_disk, sheetname='IRIS', header=5)
-
 
 
 

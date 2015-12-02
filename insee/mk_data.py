@@ -12,10 +12,8 @@ import os
 import pandas as pd
 from get_data import (read_equipement_file, change_headers,
                       sum_of_all_features,
-                      revenu_url, _read_file_or_download, 
+                      revenu_url, recensement_url, _read_file_or_download, 
                       path_data)
-
-
 
 
 ##### équipements  #####
@@ -68,7 +66,7 @@ table_revenu = ['RFST', 'RFDM', 'RFDP', 'RFDU'] # l'ordre n'est pas
 # aléatoire, c'est celui du fichier zip (ordre alphabétique) de 2011
 useless_cols = ['IRIS','LIBIRIS','COM','LIBCOM','REG','DEP','ARR','CV','ZE2010']
 
-def routine2(year):
+def info_revenus(year):
     url_path = revenu_url(year)
     names = [x + str(year) + 'IRI.xls' for x in table_revenu]
     _read_file_or_download(names, path_data, url_path)
@@ -88,7 +86,7 @@ def routine2(year):
             assert len(data) == len(df)
     return data.rename(columns={'IRIS':'CODGEO'})
 
-revenu = routine2(2011)
+revenu = info_revenus(2011)
 
 data = equip_data.merge(revenu, how='outer')
 
@@ -103,30 +101,38 @@ data = equip_data.merge(revenu, how='outer')
 ####                CENSUS FILES
 ############################################################
 
-list_recensement = ['logement', 'diplomes-formation', 
-                    'couples-familles-menages', 'evol-struct-pop',
-                    'activite-residents']
+list_recensement = ['logement', 'formation', 
+                    'famille', 'population',
+                    'activite-resident']
+year = 2011
 
-filename = 'base-ic-' + file + '-2011.xls'
+key = ['IRIS', 'LIBIRIS', 'COM', 'LIBCOM', 'REG', 'DEP', 'UU2010',
+       'TRIRIS', 'GRD_QUART', 'TYP_IRIS', 'MODIF_IRIS', 'LAB_IRIS']
 
-
-activite.rename(columns={'IRIS':'CODGEO', 'LIBIRIS': 'LIBGEO'}, inplace=True)
-
-
-## Logement
-logement = pd.read_excel(path_data+'base-ic-logement-2011.xls', sheetname='IRIS')
-# creating header from file
-header = logement.loc[4].tolist()
-logement.columns = header
-logement.rename(columns={'IRIS':'CODGEO', 'LIBIRIS': 'LIBGEO'}, inplace=True)
-# to get real values
-logement = logement[5:]
-
-## Population
-population = pd.read_excel(path_data+'base-ic-evol-struct-pop-2011.xls', sheetname='IRIS')
-
-
-key = ['CODGEO', 'LIBGEO', 'COM', 'LIBCOM', 'REG', 'DEP', 'UU2010',
-       'TRIRIS', 'GRD_QUART', 'TYP_IRIS', 'MODIF_IRIS', 'LAB_IRIS'] # This line has been load with Logement file
-
-data = pd.merge(data, activite[features], on=key, how='outer')
+def info_population(year):
+    data = None
+    for file in list_recensement:
+        url_path = recensement_url(file, year)
+        filename = 'base-ic-' + file + '-' + str(year) + '.xls'
+        _read_file_or_download(filename, path_data, url_path)
+        path_file_on_disk = path_data + filename
+        df = pd.read_excel(path_file_on_disk, sheetname='IRIS', header=5)
+        print(filename)
+        assert all([x in df.columns for x in key])
+        assert len(df) == df.IRIS.nunique()
+        print("\t il y a ", len(df),
+          " iris différentes pour et ",
+          len(df.columns) - len(key), " features")
+        if data is None:
+            data = df
+        else:
+            assert len(data) == len(df)
+            if filename == 'base-ic-activite-resident-2011.xls':
+                import pdb; pdb.set_trace()
+            data = data.merge(df, on=key, how='outer')
+            # Remarque : on a des variables qui s'appellent 'P11_POP1524', 'P11_POP2554', 'P11_POP5564'
+            # dans plusieurs tables !! 
+            assert len(data) == len(df)
+    return data.rename(columns={'IRIS':'CODGEO', 'LIBIRIS': 'LIBGEO'})
+    
+population = info_population(2011)
