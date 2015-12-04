@@ -1,26 +1,19 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Jun  4 12:45:22 2015
+Created on Fri Dec  4 09:38:50 2015
 
-Pour lire un fichier: on a besoin de plusieurs éléments:
-    - le nom que l'on va utiliser dans le code
-    - l'url sur lequel on peut télécharger le zip
-    - le nom du que l'on veut utiliser pour le fichier excel
 """
-
-import os
 import pandas as pd
-from get_data import (read_equipement_file, change_headers,
-                      sum_of_all_features,
-                      revenu_url, recensement_url, _read_file_or_download,
-                      path_data)
+from globals import path_insee, path_data, _read_file_or_download
 
 
-##### équipements  #####
+def revenu_url(year):
+    filename = 'structure-distrib-revenus'
+    general_url = path_insee + filename + '/'
+    year_folder =  filename + '-' + str(year) + '/'
+    zip_name = filename + '-iris-' + str(year) + '.zip'
+    return general_url + year_folder + zip_name
 
-
-
-##### revenus  #####
 
 table_revenu = ['RFST', 'RFDM', 'RFDP', 'RFDU'] # l'ordre n'est pas
 # aléatoire, c'est celui du fichier zip (ordre alphabétique) de 2011
@@ -45,13 +38,3 @@ def info_revenus(year):
             data = data.merge(df, how='outer')
             assert len(data) == len(df)
     return data.rename(columns={'IRIS':'CODGEO'})
-
-
-
-############################################################
-####                CENSUS FILES
-############################################################
-
-
-
-population = info_population(2011)
