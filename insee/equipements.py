@@ -7,27 +7,22 @@ Created on Fri Dec  4 09:40:36 2015
 import pandas as pd
 from globals import path_insee, path_data, _read_file_or_download
 
-def equipement_url(filename):
-    url_path = path_insee + filename + '/' + filename + '-infra-13.zip'
+
+
+def equipement_url(filename, year):
+    if year == 2013:
+        year_str = str(year)[-2:]
+    if year == 2014:
+        year_str = str(year)       
+    url_path = path_insee + filename + '/' + filename + '-infra-' + year_str + '.zip'
     return url_path
 
 
-def read_equipement_file(filename):
-    url_path = equipement_url(filename)
-    path_file_on_disk = path_data + filename + '-infra.xls'
-    _read_file_or_download(filename + '-infra.xls', path_data, url_path)
+def read_equipement_file(filename, year):
+    url_path = equipement_url(filename, year)
+    path_file_on_disk = path_data + filename + '-infra' + str(year) + '.xls'
+    _read_file_or_download(filename + '-infra' + str(year) + '.xls', path_data, url_path)
     return pd.read_excel(path_file_on_disk, sheetname='IRIS', header=5)
-
-
-
-def change_headers(iris_df, headers_line):
-    ''' iris_df is an iris data frame'''
-#    iris_df.rename(columns={'IRIS':'CODGEO'}, inplace=True)
-    # to get real values
-    iris_df = iris_df[5:]
-    # clean Nan Columns
-    iris_df.dropna(how='any', axis=1, inplace=True)
-    return iris_df
 
 
 def sum_of_all_features(iris_df, colname, list_to_sum=None):
@@ -46,7 +41,7 @@ def sum_of_all_features(iris_df, colname, list_to_sum=None):
     return iris_df
 
 
-key = ['CODGEO', 'LIBGEO', 'COM', 'LIBCOM', 'REG', 'DEP', 'UU2010']
+#key = ['CODGEO', 'LIBGEO', 'COM', 'LIBCOM', 'REG', 'DEP', 'UU2010']
 
 columns_not_to_sum = ['CODGEO', 'LIBGEO', 'COM', 'LIBCOM', 'REG', 'DEP', 'ARR', 'CV',
              'ZE2010', 'UU2010', 'UU12010', 'ID_MODIF_GEO']
@@ -75,21 +70,25 @@ equipements = dict(
      transport_tourisme = ('equip-tour-transp', None),
      )
 
-def routine1(name):
+
+def routine1(name, year):
     assert name in equipements
     filename, list_to_sum = equipements[name]
-    df = read_equipement_file(filename)
-    df = change_headers(df, headers_line=4)
+    df = read_equipement_file(filename, year)
+    # a bug in one excel... 'equip-serv-commerce'
+    df.dropna(how='any', axis=1, inplace=True)
+    assert all(df.isnull().sum() == 0)
     df = sum_of_all_features(df, 'nb_' + name, list_to_sum)
     assert len(df) == df.CODGEO.nunique()
     return df
 
-def info_equipement():
+
+def info_equipement(year):
     equipement = None
     for table in equipements:
         print('* lecture de ' + table)
         if equipement is None:
-            equipement = routine1(table)
+            equipement = routine1(table, year)
         else:
-            equipement = equipement.merge(routine1(table), how='outer')
+            equipement = equipement.merge(routine1(table, year), how='outer')
     return equipement
