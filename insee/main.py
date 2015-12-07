@@ -4,6 +4,7 @@ Created on Fri Dec  4 09:38:28 2015
 
 """
 
+
 from globals import path_data
 
 print("Initialisation...")
@@ -12,7 +13,7 @@ from revenus import info_revenus
 from census import info_population
 
 
-equipement = info_equipement()
+equipement = info_equipement(2013)
 revenu = info_revenus(2011)
 population = info_population(2011)
 

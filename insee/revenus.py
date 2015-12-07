@@ -3,6 +3,9 @@
 Created on Fri Dec  4 09:38:50 2015
 
 """
+from __future__ import print_function
+
+
 import pandas as pd
 from globals import path_insee, path_data, _read_file_or_download
 
@@ -18,6 +21,7 @@ def revenu_url(year):
 table_revenu = ['RFST', 'RFDM', 'RFDP', 'RFDU'] # l'ordre n'est pas
 # aléatoire, c'est celui du fichier zip (ordre alphabétique) de 2011
 useless_cols = ['IRIS','LIBIRIS','COM','LIBCOM','REG','DEP','ARR','CV','ZE2010']
+
 
 def info_revenus(year):
     url_path = revenu_url(year)

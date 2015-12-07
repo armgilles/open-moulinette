@@ -2,11 +2,13 @@
 """
 Created on Fri Dec  4 09:39:08 2015
 
-@author: User
 """
+from __future__ import print_function
+
 
 import pandas as pd
 from globals import path_insee, path_data, _read_file_or_download
+
 
 def recensement_url(filename, year):
     part1 = 'rp' + str(year) + '/infracommunal'
@@ -14,13 +16,14 @@ def recensement_url(filename, year):
     part3 = '/infra-' + filename + '-' + str(year) + '.zip'
     return path_insee + part1 + part2 + part3
 
+
 list_recensement = ['logement', 'formation',
                     'famille', 'population',
                     'activite-resident']
-year = 2011
 
 key = ['IRIS', 'LIBIRIS', 'COM', 'LIBCOM', 'REG', 'DEP', 'UU2010',
        'TRIRIS', 'GRD_QUART', 'TYP_IRIS', 'MODIF_IRIS', 'LAB_IRIS']
+
 
 def info_population(year):
     data = None
