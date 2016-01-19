@@ -15,7 +15,7 @@ from census import info_population
 
 equipement = info_equipement(2013)
 revenu = info_revenus(2011)
-population = info_population(2011)
+population = info_population(2011) # Have to add 2012 for new censur data
 
 data = equipement.merge(revenu, how='outer')
 ## petit bout de code pour voir ce qui s'ajoute
@@ -32,4 +32,4 @@ data = data.merge(population, how='outer')
 #cond = revenu.CODGEO.isin(equip_data.CODGEO)
 #revenu[~cond]
 
-data.to_csv('output.csv')
+data.to_csv('output.csv', encoding='utf-8', index=False)

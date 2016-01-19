@@ -68,8 +68,8 @@ equipements = dict(
     sante = ('equip-serv-sante', None),
     medical = ('equip-serv-medical-para', None),
     service_particulier = ('equip-serv-particuliers', None),
-    transport_tourisme = ('equip-tour-transp', None),
-   )
+    transport_tourisme = ('equip-tour-transp', None)
+)
 
 
 def routine1(name, year):
@@ -88,7 +88,7 @@ def routine1(name, year):
 
 
 def info_equipement(year):
-    equipements = None
+    equipement = None
     for table in equipements:
         print('* lecture de ' + table)
         if equipement is None:
